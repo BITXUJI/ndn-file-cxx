@@ -60,13 +60,13 @@ void Server::onInterest(const ndn::Interest & interest){
     else{
         std::string requestFileName = interestName.at(-3).toUri();
         const auto segmentNo = static_cast<u_int64_t>(interestName.at(-1).toNumber());
-        // std::cout << segmentNo << std::endl;
-        if(segmentNo % MAXSIZE == 0){
-            makeFileData(requestFileName, segmentNo);
+        //std::cout << segmentNo << std::endl;
+        if((segmentNo-1) % MAXSIZE == 0){
+            makeFileData(requestFileName, segmentNo-1);
         }
 
         // std::cout << "send data: " << m_store[requestFileName]->at(segmentNo % MAXSIZE)->getName() << std::endl;
-        m_face.put(*(m_store[requestFileName]->at(segmentNo % MAXSIZE)));
+        m_face.put(*(m_store[requestFileName]->at((segmentNo-1) % MAXSIZE)));
     }
 }
 
@@ -94,7 +94,7 @@ void Server::makeFileData(const std::string & fileName, u_int64_t begin){
             const auto nCharsRead = fin.gcount(); //读取个数
             if(nCharsRead > 0) {
                 //xuji modified to add placeholder
-                ndn::Name dataName = ndn::Name(m_prefix).append(fileName).append(NdnFileConfig::placeHolder).appendNumber(i);
+                ndn::Name dataName = ndn::Name(m_prefix).append(fileName).append(NdnFileConfig::placeHolder).appendNumber(i+1);
                 auto data = std::make_unique<ndn::Data>(dataName);
                 data->setFreshnessPeriod(ndn::time::milliseconds(2000));
                 data->setContent(buffer.data(), static_cast<size_t>(nCharsRead));
@@ -108,8 +108,8 @@ void Server::makeFileData(const std::string & fileName, u_int64_t begin){
             fin.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
             const auto nCharsRead = fin.gcount(); //读取个数
             if (nCharsRead > 0) {
-                //xuji modified to add placeholder
-                ndn::Name dataName = ndn::Name(m_prefix).append(fileName).append(NdnFileConfig::placeHolder).appendNumber(begin + file_Data->size());
+                //modified to add placeholder
+                ndn::Name dataName = ndn::Name(m_prefix).append(fileName).append(NdnFileConfig::placeHolder).appendNumber(begin + file_Data->size()+1);
                 auto data = std::make_unique<ndn::Data>(dataName);
                 data->setFreshnessPeriod(ndn::time::milliseconds(2000));
                 data->setContent(buffer.data(), static_cast<size_t>(nCharsRead));

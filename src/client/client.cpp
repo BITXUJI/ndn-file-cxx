@@ -40,8 +40,8 @@ void Client::requestFileList(){
 void Client::requestFile(){
   
         ndn::Name interestName(m_prefix);
-        //xuji modified to add placeHolder.
-        sendInterest(interestName.append(m_fileName).append(NdnFileConfig::placeHolder).appendNumber(0));
+        //modified to add placeHolder.0 -> 1
+        sendInterest(interestName.append(m_fileName).append(NdnFileConfig::placeHolder).appendNumber(1));
 
         while(!m_done){
             m_face.processEvents();
@@ -87,19 +87,19 @@ void Client::onData(const ndn::Data & data){
         m_dataCache.insert({receiveSeq, dataPtr});
 
         
-
-        if((receiveSeq+1) == m_maxSeq || (receiveSeq+1) % MAX_CACHE == 0){
+        
+        if((receiveSeq) == m_maxSeq || (receiveSeq) % MAX_CACHE == 0){
             writeToFile();
         }
 
-        if((receiveSeq+1) == m_maxSeq){
+        if((receiveSeq) == m_maxSeq){
           
             m_done = true;
             std::cout <<"Last segment received." << std::endl;
         }
         else{
             ndn::Name interestName(m_prefix);
-            //xuji modified to add placeholder
+            //modified to add placeholder
             sendInterest(interestName.append(m_fileName).append(NdnFileConfig::placeHolder).appendNumber(receiveSeq+1));
         }
     }
@@ -115,8 +115,8 @@ void Client::onTimeOut(const ndn::Interest & interest){
 
     // retransmission
     ndn::Name interestName(m_prefix);
-    //xuji modified to add placeholder
-    sendInterest(interestName.append(m_fileName).append(NdnFileConfig::placeHolder).appendNumber(receiveSeq+1));
+    // modified to add placeholder
+    sendInterest(interestName.append(m_fileName).append(NdnFileConfig::placeHolder).appendNumber(receiveSeq));
 }
 
 void Client::writeToFile(){
@@ -124,7 +124,7 @@ void Client::writeToFile(){
     filePath.append(m_fileName);
     std::ofstream fout;
 
-    if(m_dataCache.find(0) != m_dataCache.end()){
+    if(m_dataCache.find(1) != m_dataCache.end()){
         fout.open(filePath, std::ios::out | std::ios::trunc);  
     }
     else{
