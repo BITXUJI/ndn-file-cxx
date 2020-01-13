@@ -14,10 +14,10 @@ namespace NdnFileConfig{
 	static const std::string placeHolder ="ABCD";
 
 	//path for downloaded file at client side 
-    static const std::string downloadFilePath="/home/ndn/ndn-file/download/";
+    static const std::string downloadFilePath="/home/ndn/ndn-file-cxx/download/";
 
 	//path for uploading file at server side
-	static const std::string uploadFilePath="/home/ndn/ndn-file/upload/";
+	static const std::string uploadFilePath="/home/ndn/ndn-file-cxx/upload/";
 
 	//max sequence number of each interest to be sent;
     static const u_int64_t maxSeq=10240; //10MB
